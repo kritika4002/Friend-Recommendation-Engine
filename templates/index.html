@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend Recommendation System</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-indigo: #4f46e5;
+            --primary-indigo-dark: #4338ca;
+            --primary-indigo-light: #eef2ff;
+            --success-green: #22c55e;
+            --success-green-dark: #16a34a;
+            --danger-red: #ef4444;
+            --danger-red-dark: #dc2626;
+            --danger-red-light: #fee2e2;
+            
+            --bg-color: #f8faff; /* Lighter, cleaner background */
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-primary);
+        }
+        
+        /* --- Main Layout --- */
+        .top-nav {
+            background: var(--card-bg);
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Pushes button to the right */
+            gap: 12px;
+        }
+        .top-nav h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 32px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .card-header h2 { 
+            font-size: 1.25rem; 
+            font-weight: 600;
+            margin: 0;
+        }
+        .card-header-icon {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: var(--primary-indigo-light);
+            color: var(--primary-indigo);
+        }
+        /* New Delete Section Style */
+        .card.delete-section {
+            border: 1px solid var(--danger-red-light);
+        }
+        .delete-section .card-header-icon {
+            background: var(--danger-red-light);
+            color: var(--danger-red);
+        }
+
+        /* --- Forms --- */
+        label { 
+            font-weight: 500; 
+            display: block; 
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        input[type="text"], select { 
+            padding: 12px 15px; 
+            font-size: 1rem; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color);
+            width: 100%;
+            box-sizing: border-box; /* Important for 100% width */
+            
+            /* FIX for Dropdown Arrow */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px 16px;
+            padding-right: 40px; /* Make space for arrow */
+        }
+        input[type="text"] {
+             background-image: none; /* Remove arrow from text inputs */
+             padding-right: 15px;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary-indigo);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            outline: none;
+            background-color: var(--card-bg);
+        }
+        
+        button { 
+            padding: 12px 18px; 
+            font-size: 1rem; 
+            font-weight: 600;
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Nav button style */
+        .top-nav form { margin: 0; }
+        .btn-nav {
+            width: auto;
+            margin-top: 0;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-primary { background-color: var(--primary-indigo); color: white; }
+        .btn-primary:hover { background-color: var(--primary-indigo-dark); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        
+        .btn-danger { background-color: var(--danger-red); color: white; }
+        .btn-danger:hover { background-color: var(--danger-red-dark); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
+        
+        .btn-success { background-color: var(--success-green); color: white; }
+        .btn-success:hover { background-color: var(--success-green-dark); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); }
+
+        /* FIXED: Layout for Recommendation form */
+        .recommendation-form {
+            max-width: 500px; /* Give it a bit more space */
+        }
+        .recommendation-form .form-group {
+            display: grid;
+            grid-template-columns: 1fr auto; /* CHANGED: Give select box remaining space, let button fit content */
+            gap: 16px;
+            align-items: flex-end; /* Aligns button with select box */
+        }
+        .recommendation-form button {
+            margin-top: 0; /* Override default button margin */
+            width: auto; /* CHANGED: Button width will fit its content */
+            white-space: nowrap; /* CHANGED: Prevent button text from wrapping */
+        }
+
+
+        /* FIXED: Grid layout for CRUD sections */
+        .crud-section { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 24px; 
+        }
+
+        /* FIXED: Button alignment for CRUD forms */
+        .crud-form { 
+            padding: 24px;
+            border-radius: 12px;
+            background: #fdfdfd;
+            border: 1px solid var(--border-color);
+            /* Flex layout to align buttons */
+            display: flex;
+            flex-direction: column;
+        }
+        .crud-form form {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Make form fill the card */
+        }
+        .crud-form-content {
+            flex-grow: 1; /* This is the key: pushes button to bottom */
+        }
+        /* Remove margin from last form element */
+        .crud-form-content > *:last-child {
+            margin-bottom: 0;
+        }
+        .crud-form button {
+            margin-top: 24px; /* Standard spacing above all buttons */
+        }
+        
+
+        /* --- Tables --- */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 16px; 
+            text-align: left; 
+            white-space: nowrap;
+        }
+        th { 
+            background-color: var(--bg-color); 
+            font-weight: 600; 
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f9faff; }
+
+        /* --- Flash Messages --- */
+        .flash { 
+            padding: 16px; 
+            margin-bottom: 24px; 
+            border-radius: 8px; 
+            font-weight: 500; 
+            border: 1px solid transparent;
+            position: fixed;
+            top: 100px;
+            right: 32px;
+            z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .flash.success { background-color: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .flash.error { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .flash.warning { background-color: #fef3c7; color: #92400e; border-color: #fde68a; }
+        
+        @media (max-width: 900px) {
+            /* Stack CRUD forms on smaller screens */
+            .crud-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+            .top-nav {
+                padding: 16px;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .flash {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 16px;
+            }
+            /* Stack recommendation form on small screens */
+            .recommendation-form .form-group {
+                grid-template-columns: 1fr;
+            }
+            .recommendation-form button {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== TOP NAVIGATION ===== -->
+    <nav class="top-nav">
+        <div class="top-nav-left">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-indigo);"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <h1>Friend Recommendation System</h1>
+        </div>
+        
+        <form action="/run_gds" method="POST">
+            <button type="submit" class="btn-primary btn-nav">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Run GDS Algorithms
+            </button>
+        </form>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        
+        <!-- Flash Messages Container -->
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Recommendations Card (Main Feature) -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h2>Recommendation Engine</h2>
+            </div>
+            
+            <form action="/" method="POST" class="recommendation-form">
+                <div class="form-group">
+                    <div>
+                        <label for="user">Select User to Get Recommendations For:</label>
+                        <select id="user" name="user">
+                            {% for user in users %}
+                                <option value="{{ user }}" {% if user == selected_user %}selected{% endif %}>
+                                    {{ user }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Get Recommendations</button>
+                </div>
+            </form>
+
+            {% if selected_user %}
+                <div class="results" style="margin-top: 32px;">
+                    <h3 style="font-size: 1.5rem;">Results for {{ selected_user }}</h3>
+                    
+                    <h4 style="font-size: 1.1rem; font-weight: 600; margin-top: 24px;">Algorithm 1: Friend Recommendations</h4>
+                    {% if recommendations %}
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Recommendation</th>
+                                        <th>Influence (PageRank)</th>
+                                        <th>Mutual Friends</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rec in recommendations %}
+                                    <tr>
+                                        <td>{{ rec.Recommendation }}</td>
+                                        <td>{{ "%.4f"|format(rec.Influence) if rec.Influence is not none else 'N/A' }}</td>
+                                        <td>{{ rec.MutualFriends }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p style="color: var(--text-secondary);">No recommendations found.</p>
+                    {% endif %}
+
+                    <h4 style="margin-top: 25px; font-size: 1.1rem; font-weight: 600;">Algorithm 2: Community Detection (WCC)</h4>
+                    <p style="font-size: 1.1rem; margin-top: -10px;"><strong>Community ID:</strong> {{ "N/A" if community_id is none else community_id }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Database Management (CRUD) Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7v10c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V7"></path><path d="M12 12v5"></path><path d="M12 7v1"></path><path d="M18.3 12.3c.4-.4.7-.9.8-1.4v-1c0-1.1-.9-2-2-2h-1a2 2 0 0 0-2 2v1c.1.5.4 1 .8 1.4L15 14l3.3 2.3c.4.3.7.8.8 1.3v1c0 1.1-.9 2-2 2h-1a2 2 0 0 1-2-2v-1c-.1-.5-.4-1-.8-1.3L9 14l-3.3-2.3C5.4 11.4 5.1 11 5 10.5v-1c0-1.1.9-2 2-2h1a2 2 0 0 1 2 2v1c-.1.5-.4 1-.8 1.4L7 12"></path></svg>
+                </div>
+                <h2>User & Friendship Management</h2>
+            </div>
+            
+            <div class="crud-section" style="grid-template-columns: 1fr 1fr 1fr;">
+                
+                <div class="crud-form">
+                    <h3>Create User</h3>
+                    <form action="/add_user" method="POST">
+                        <div class="crud-form-content">
+                            <label for="user_name">User Name:</label>
+                            <input type="text" id="user_name" name="user_name" placeholder="e.g., 'Gita'">
+                        </div>
+                        <button type="submit" class="btn-primary">Create User</button>
+                    </form>
+                </div>
+                
+                <div class="crud-form">
+                    <h3>Update User</h3>
+                    <form action="/update_user" method="POST">
+                        <div class="crud-form-content">
+                            <label for="old_name">User:</label>
+                            <select id="old_name" name="old_name">
+                                {% for user in users %}<option value="{{ user }}">{{ user }}</option>{% endfor %}
+                            </select>
+                            <label for="new_name" style="margin-top: 10px;">New Name:</label>
+                            <input type="text" id="new_name" name="new_name" placeholder="e.g., 'Gita Sharma'">
+                        </div>
+                        <button type="submit" class="btn-primary">Update User</button>
+                    </form>
+                </div>
+
+                <div class="crud-form">
+                    <h3>Create Friendship</h3>
+                    <form action="/add_friendship" method="POST">
+                        <div class="crud-form-content">
+                            <label for="user1">User 1:</label>
+                            <select id="user1" name="user1">
+                                {% for user in users %}<option value="{{ user }}">{{ user }}</Soption>{% endfor %}
+                            </select>
+                            <label for="user2" style="margin-top: 10px;">User 2:</label>
+                            <select id="user2" name="user2">
+                            {% for user in users %}<option value="{{ user }}">{{ user }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Friendship</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW Delete Section Card -->
+        <div class="card delete-section">
+            <div class="card-header">
+                <div class="card-header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+                <h2>Delete Section</h2>
+            </div>
+            
+            <div class="crud-section" style="grid-template-columns: 1fr 1fr;">
+                <div class="crud-form">
+                    <h3>Delete User</h3>
+                    <p style="color: var(--text-secondary); margin-top: -10px; font-size: 0.9rem;">This action is permanent and will also delete all their friendships.</p>
+                    <form action="/delete_user" method="POST">
+                        <div class="crud-form-content">
+                            <label for="user_name_del">User:</label>
+                            <select id="user_name_del" name="user_name">
+                                {% for user in users %}<option value="{{ user }}">{{ user }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-danger">Delete User</button>
+                    </form>
+                </div>
+                
+                <div class="crud-form">
+                    <h3>Delete Friendship</h3>
+                    <p style="color: var(--text-secondary); margin-top: -10px; font-size: 0.9rem;">This action only removes the connection between two users.</p>
+                    <form action="/delete_friendship" method="POST">
+                        <div class="crud-form-content">
+                            <label for="del_user1">User 1:</label>
+                            <select id="del_user1" name="user1">
+                                {% for user in users %}<option value="{{ user }}">{{ user }}</option>{% endfor %}
+                            </select>
+                            <label for="del_user2" style="margin-top: 10px;">User 2:</label>
+                            <select id="del_user2" name="user2">
+                            {% for user in users %}<option value="{{ user }}">{{ user }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-danger">Delete Friendship</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+
+
